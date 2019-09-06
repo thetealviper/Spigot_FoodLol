@@ -1,0 +1,89 @@
+##########################################################
+#                     FoodLol Config                     #
+##########################################################
+
+Cooldown: 2
+#This is the cooldown in seconds between "eating" food items
+#This is in use because there is no eating animation
+
+Cooldown_Message: "&ePlease wait to swallow..."
+#This is the message if players attempt to eat too soon after
+#just eating
+
+Sound: 
+ default: "EAT"
+ AddThemLikeThis: "GHAST_SCREAM"
+#You don't have to include this for each food type but for the
+#specifics that you want to change, put them here.
+#https://gist.github.com/NiklasEi/7bd0ffd136f8459df0940e4501d47a8a
+
+Override_Max_Health: true
+#If this is enabled and a food item gives more health than a
+#player's maximum health, it will increase their maximum
+#health to account for it. This can be used to get unsafe
+#amounts of health with too many items
+
+Food:
+ ExampleFoodIdentifier:
+  health: 0
+  hunger: 1
+  id: "DIAMOND_SWORD:2"
+  name: "&r&l&1L&2o&3l&4l&5i&6p&7o&8p"
+  lore:
+   - "&r&dA delicious lollipop."
+  return:
+   id: "STICK"
+   name: "&r&1Lollipop Stick"
+   lore:
+    - "&r&7This seems a bit useless."
+  flags:
+   - "HIDE_ATTRIBUTES"
+   - "HIDE_UNBREAKABLE"
+  tags:
+   - "unbreakable"
+   - "forcestack:12"
+  commands:
+   - "/say I like men."
+ AddThemLikeThis:
+  health: -2
+  hunger: 0
+  id: "DIAMOND_SWORD:1"
+  name: "&r&l&aPoison"
+  lore:
+   - "&r&2Probably don't eat this."
+#Here is where you add all the food items you want to create
+#health - The change in health the player gets upon eating. Can be negative. Not optional to include.
+#hunger - The change in hunger the player gets upon eating. Can be negative. Not optional to include.
+#id - This is intended to be the item of a custom textured item. You should know how this works. THIS IS WHERE DAMAGE IS PLACED. Not optional to include.
+#return - The item the player gets back in their inventory after eating. Uses this same formatting but without health and hunger. Optional to include
+#amount - This is the size of the item stack. Optional. Not sure why you'd use this but it's an option.
+#name - This is the name of the item. Optional.
+#lore - This is the lore of the item. Must follow multiple line structure. Optional.
+#enchantments - Format is 'ENCHANTMENT:LEVEL'. Optional. Not sure why you'd add it but it's an option.
+#- arrowdamage
+#- arrowfire
+#- arrowinfinite
+#- arrowknockback
+#- damage
+#- digspeed
+#- durability
+#- fireaspect
+#- knockback
+#- lootbonusblock
+#- lootbonusmob
+#- luck
+#- protectionfall
+#- protectionfire
+#- silktouch
+#effects - Format is 'EFFECT:LEVEL:TIME (seconds)'.This is the effects that a player will receive upon eating a certain food. Must follow multiple line structure. Optional.
+#        - Effect names can be found at
+#        - https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
+#commands - Format is '/<command>'. This forces the player to run a command with max permissions. Just to specify however, the player is running the command not server. Optional.
+
+
+##########################################################
+#                        Version                         #
+##########################################################
+
+VERSION: 8
+#Do not touch this. No touchy.
