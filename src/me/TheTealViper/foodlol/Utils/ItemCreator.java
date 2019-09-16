@@ -40,16 +40,11 @@ public class ItemCreator implements Listener{
 			item = new ItemStack(Material.getMaterial(sec.getString("id")));
 		}
 		List<String> tags = sec.contains("tags") ? sec.getStringList("tags") : new ArrayList<String>();
-		for(String s : tags){
-			if(s.startsWith("skulltexture") && item.getType().equals(Material.PLAYER_HEAD)){
-				item = Skull.getCustomSkull("http://textures.minecraft.net/texture/" + s.replace("skulltexture:", ""));
-			}
-		}
 		if(sec.contains("amount"))
 			item.setAmount(sec.getInt("amount"));
 		ItemMeta meta = Bukkit.getItemFactory().getItemMeta(Material.STICK);
 		if(sec.contains("name") && !sec.getString("name").equals("")){
-			meta.setDisplayName(StringUtils.makeColors(sec.getString("name")));
+			meta.setDisplayName(ViperStringUtils.makeColors(sec.getString("name")));
 			item.setItemMeta(meta);
 		}
 		List<String> enchantmentStrings = sec.contains("enchantments") ? sec.getStringList("enchantments") : new ArrayList<String>();
@@ -102,10 +97,16 @@ public class ItemCreator implements Listener{
     			item.setItemMeta(meta);
     		}
     	}
+		for(String s : tags) {
+			if(s.startsWith("skulltexture") && item.getType().equals(Material.PLAYER_HEAD)){
+				item = Base64Skull.getSkull("http://textures.minecraft.net/texture/" + s.replace("skulltexture:", ""));
+//				item = Base64Skull.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTk5NzBkMDg1YmY1YWFlODc1MTY1ZjgzMzc4OTYyNDJjMTJjZDExMjk5ZGY4OTg5MWE4YTgxM2FkZWI4In19fQ==");
+			}
+		}
 		List<String> lore = sec.contains("lore") ? sec.getStringList("lore") : new ArrayList<String>();
 		if(!lore.isEmpty()){
 			for(int i = 0;i < lore.size();i++){
-				lore.set(i, StringUtils.makeColors(lore.get(i)));
+				lore.set(i, ViperStringUtils.makeColors(lore.get(i)));
 			}
 			meta = item.getItemMeta();
 			meta.setLore(lore);

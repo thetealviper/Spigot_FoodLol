@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
-public class StringUtils {
+public class ViperStringUtils {
 
 	// String constants. TODO Change them to something unique to avoid conflict with other plugins!
 	private static final String SEQUENCE_HEADER = "" + ChatColor.RESET + ChatColor.UNDERLINE + ChatColor.RESET;
