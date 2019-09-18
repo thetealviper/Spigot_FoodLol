@@ -22,12 +22,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 
+import me.TheTealViper.foodlol.FoodLol;
+
 public class ItemCreator implements Listener{
 	private static List<Material> durMats = new ArrayList<Material>();
 	public static Map<ItemStack, Integer> damageInfo = new HashMap<ItemStack, Integer>();
 	public static Map<ItemStack, Integer> forceStackInfo = new HashMap<ItemStack, Integer>();
 	
-	public static ItemStack createItemFromConfiguration(ConfigurationSection sec){
+	public static ItemStack createItemFromConfiguration(String foodName, ConfigurationSection sec){
 		if(durMats.isEmpty())
 			loadDurMats();
 		ItemStack item = null;
@@ -99,7 +101,7 @@ public class ItemCreator implements Listener{
     	}
 		for(String s : tags) {
 			if(s.startsWith("skulltexture") && item.getType().equals(Material.PLAYER_HEAD)){
-				item = Base64Skull.getSkull("http://textures.minecraft.net/texture/" + s.replace("skulltexture:", ""));
+				item = Base64Skull.getSkull(item, FoodLol.getUUIDFromFoodName(foodName), "http://textures.minecraft.net/texture/" + s.replace("skulltexture:", ""));
 //				item = Base64Skull.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTk5NzBkMDg1YmY1YWFlODc1MTY1ZjgzMzc4OTYyNDJjMTJjZDExMjk5ZGY4OTg5MWE4YTgxM2FkZWI4In19fQ==");
 			}
 		}

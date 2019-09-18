@@ -31,14 +31,13 @@ public class Base64Skull {
 //		return item;
 //	}
 	
-	public static ItemStack getSkull(String url) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+	public static ItemStack getSkull(ItemStack head, String uuid, String url) {
         if(url == null)return head;
         if(url.isEmpty())return head;
        
        
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        GameProfile profile = new GameProfile(UUID.fromString(uuid), null);
         byte[] encodedData = Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
         profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
         Field profileField = null;

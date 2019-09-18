@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,8 +41,10 @@ public class FoodLol extends JavaPlugin implements Listener{
 	Map<String, Long> cooldownData = new HashMap<String, Long>();
 	boolean overrideMaxHealth = false;
 	PluginFile inGameMadeRecipes = new PluginFile(this, "InGameMadeRecipes.yml");
+	public static FoodLol plugin = null;
 	
 	public void onEnable(){
+		plugin = this;
 		EnableShit.handleOnEnable(this, this, "-1");
 		overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
 		
@@ -57,7 +60,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 		ConfigurationSection allFoodSec = getConfig().getConfigurationSection("Food");
 		for(String foodID : allFoodSec.getKeys(false)){
 			ConfigurationSection foodSec = allFoodSec.getConfigurationSection(foodID);
-			ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodSec);
+			ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
 			ItemMeta meta = foodItem.getItemMeta();
 			meta.setUnbreakable(true);
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
@@ -68,7 +71,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 			if(foodSec.contains("effects"))
 				effectsInfo.put(foodID, foodSec.getStringList("effects"));
 			if(foodSec.contains("return"))
-				returnInfo.put(foodID, ItemCreator.createItemFromConfiguration(foodSec.getConfigurationSection("return")));
+				returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
 			if(foodSec.contains("commands"))
 				commandInfo.put(foodID, foodSec.getStringList("commands"));
 			else
@@ -79,7 +82,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 		if(allFoodSec != null){
 			for(String foodID : allFoodSec.getKeys(false)){
 				ConfigurationSection foodSec = allFoodSec.getConfigurationSection(foodID);
-				ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodSec);
+				ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
 				ItemMeta meta = foodItem.getItemMeta();
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
@@ -92,7 +95,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 				else
 					effectsInfo.put(foodID, new ArrayList<String>());
 				if(foodSec.contains("return"))
-					returnInfo.put(foodID, ItemCreator.createItemFromConfiguration(foodSec.getConfigurationSection("return")));
+					returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
 				if(foodSec.contains("commands"))
 					commandInfo.put(foodID, foodSec.getStringList("commands"));
 				else
@@ -116,7 +119,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 	}
 	
 	private boolean onRightClick(Player p){
-		ItemStack hand = p.getItemInHand();
+		ItemStack hand = p.getInventory().getItemInMainHand();
 		boolean found = false;
 		for(ItemStack dummy : foodInfo.values()){
 			if(hand.isSimilar(dummy)){
@@ -124,8 +127,11 @@ public class FoodLol extends JavaPlugin implements Listener{
 				break;
 			}
 		}
-		if(!found || p.getFoodLevel() == 20)
+		if(!found) {
 			return false;
+		}
+		if(p.getFoodLevel() == 20)
+			return true;
 		String foodID = "";
 		for(String dummy : foodInfo.keySet()){
 			if(foodInfo.get(dummy).isSimilar(hand)){
@@ -216,7 +222,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 			return true;
 		}else
 			p.sendMessage(makeColors(getConfig().getString("Cooldown_Message")));
-		return false;
+		return true;
 	}
 	
 	@EventHandler
@@ -403,4 +409,19 @@ public class FoodLol extends JavaPlugin implements Listener{
         return replaced;
     }
 	
+	public static String getUUIDFromFoodName(String foodName) {
+		PluginFile pf = new PluginFile(plugin, "uuidbase");
+		if(pf.getKeys(false) == null || pf.getKeys(false).size() == 0) {
+			pf.save();
+		}
+		
+		if(pf.contains(foodName)) {
+			return pf.getString(foodName);
+		}else {
+			String uuid = UUID.randomUUID().toString();
+			pf.set(foodName, uuid);
+			pf.save();
+			return uuid;
+		}
+	}
 }
