@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,20 +20,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import me.TheTealViper.foodlol.Utils.EnableShit;
-import me.TheTealViper.foodlol.Utils.ItemCreator;
 import me.TheTealViper.foodlol.Utils.PluginFile;
-import me.TheTealViper.foodlol.Utils.Sound;
+import me.TheTealViper.foodlol.Utils.UtilityEquippedJavaPlugin;
 
-public class FoodLol extends JavaPlugin implements Listener{
-	Map<String, ItemStack> foodInfo = new HashMap<String, ItemStack>();
+public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
+//	public Map<String, ItemStack> foodInfo = new HashMap<String, ItemStack>();
 	Map<String, Double> healthInfo = new HashMap<String, Double>();
 	Map<String, Double> hungerInfo = new HashMap<String, Double>();
 	Map<String, ItemStack> returnInfo = new HashMap<String, ItemStack>();
@@ -40,14 +36,12 @@ public class FoodLol extends JavaPlugin implements Listener{
 	Map<String, List<String>> commandInfo = new HashMap<String, List<String>>();
 	Map<String, Long> cooldownData = new HashMap<String, Long>();
 	boolean overrideMaxHealth = false;
-	PluginFile inGameMadeRecipes = new PluginFile(this, "InGameMadeRecipes.yml");
-	public static FoodLol plugin = null;
 	
 	public void onEnable(){
-		plugin = this;
-		EnableShit.handleOnEnable(this, this, "-1");
-		overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
+		StartupPlugin(this, "50031");
 		
+		custPlugin = this;
+		overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
 		loadRecipes();
 	}
 	
@@ -60,48 +54,46 @@ public class FoodLol extends JavaPlugin implements Listener{
 		ConfigurationSection allFoodSec = getConfig().getConfigurationSection("Food");
 		for(String foodID : allFoodSec.getKeys(false)){
 			ConfigurationSection foodSec = allFoodSec.getConfigurationSection(foodID);
-			ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
-			ItemMeta meta = foodItem.getItemMeta();
-			meta.setUnbreakable(true);
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
-			foodItem.setItemMeta(meta);
-			foodInfo.put(foodID, foodItem);
+//			ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
+			getLoadEnhancedItemstackFromConfig().loadItem(foodID, foodSec);
 			healthInfo.put(foodID, foodSec.getDouble("health"));
 			hungerInfo.put(foodID, foodSec.getDouble("hunger"));
 			if(foodSec.contains("effects"))
 				effectsInfo.put(foodID, foodSec.getStringList("effects"));
-			if(foodSec.contains("return"))
-				returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
+			if(foodSec.contains("return")) {
+//				returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
+				getLoadEnhancedItemstackFromConfig().loadItem(foodID + "-return", foodSec.getConfigurationSection("return"));
+				returnInfo.put(foodID, getLoadEnhancedItemstackFromConfig().getItem(foodID + "-return"));
+			}
 			if(foodSec.contains("commands"))
 				commandInfo.put(foodID, foodSec.getStringList("commands"));
 			else
 				commandInfo.put(foodID, new ArrayList<String>());
 		}
-		//In game config
-		allFoodSec = inGameMadeRecipes.getConfigurationSection("Food");
-		if(allFoodSec != null){
-			for(String foodID : allFoodSec.getKeys(false)){
-				ConfigurationSection foodSec = allFoodSec.getConfigurationSection(foodID);
-				ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
-				ItemMeta meta = foodItem.getItemMeta();
-				meta.setUnbreakable(true);
-				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
-				foodItem.setItemMeta(meta);
-				foodInfo.put(foodID, foodItem);
-				healthInfo.put(foodID, foodSec.getDouble("health"));
-				hungerInfo.put(foodID, foodSec.getDouble("hunger"));
-				if(foodSec.contains("effects"))
-					effectsInfo.put(foodID, foodSec.getStringList("effects"));
-				else
-					effectsInfo.put(foodID, new ArrayList<String>());
-				if(foodSec.contains("return"))
-					returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
-				if(foodSec.contains("commands"))
-					commandInfo.put(foodID, foodSec.getStringList("commands"));
-				else
-					commandInfo.put(foodID, new ArrayList<String>());
-			}
-		}
+//		//In game config
+//		allFoodSec = inGameMadeRecipes.getConfigurationSection("Food");
+//		if(allFoodSec != null){
+//			for(String foodID : allFoodSec.getKeys(false)){
+//				ConfigurationSection foodSec = allFoodSec.getConfigurationSection(foodID);
+////				ItemStack foodItem = ItemCreator.createItemFromConfiguration(foodID, foodSec);
+//				getLoadEnhancedItemstackFromConfig().loadItem(foodID, foodSec);
+//				healthInfo.put(foodID, foodSec.getDouble("health"));
+//				hungerInfo.put(foodID, foodSec.getDouble("hunger"));
+//				if(foodSec.contains("effects"))
+//					effectsInfo.put(foodID, foodSec.getStringList("effects"));
+//				else
+//					effectsInfo.put(foodID, new ArrayList<String>());
+//				if(foodSec.contains("return")) {
+////					returnInfo.put(foodID, ItemCreator.createItemFromConfiguration("null", foodSec.getConfigurationSection("return")));
+//					getLoadEnhancedItemstackFromConfig().loadItem(foodID + "-return", foodSec.getConfigurationSection("return"));
+//					returnInfo.put(foodID, getLoadEnhancedItemstackFromConfig().getItem(foodID + "-return"));
+//				}
+//				if(foodSec.contains("commands"))
+//					commandInfo.put(foodID, foodSec.getStringList("commands"));
+//				else
+//					commandInfo.put(foodID, new ArrayList<String>());
+//			}
+//		}
 	}
 	
 	@EventHandler
@@ -118,10 +110,11 @@ public class FoodLol extends JavaPlugin implements Listener{
 			e.setCancelled(true);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean onRightClick(Player p){
 		ItemStack hand = p.getInventory().getItemInMainHand();
 		boolean found = false;
-		for(ItemStack dummy : foodInfo.values()){
+		for(ItemStack dummy : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.values()){
 			if(hand.isSimilar(dummy)){
 				found = true;
 				break;
@@ -133,8 +126,8 @@ public class FoodLol extends JavaPlugin implements Listener{
 		if(p.getFoodLevel() == 20)
 			return true;
 		String foodID = "";
-		for(String dummy : foodInfo.keySet()){
-			if(foodInfo.get(dummy).isSimilar(hand)){
+		for(String dummy : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.keySet()){
+			if(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(dummy).isSimilar(hand)){
 				foodID = dummy;
 				break;
 			}
@@ -211,9 +204,11 @@ public class FoodLol extends JavaPlugin implements Listener{
 				final int index = i;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {public void run() {
 					if(getConfig().contains("Sound." + FINALFOODID)){
-						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound." + FINALFOODID)).bukkitSound(), 1F, (float) (Math.random() * 2));
+//						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound." + FINALFOODID)).bukkitSound(), 1F, (float) (Math.random() * 2));
+						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound." + FINALFOODID)), 1F, (float) (Math.random() * 2));
 					}else{
-						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound.default")).bukkitSound(), 1F, (float) (Math.random() * 2));
+//						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound.default")).bukkitSound(), 1F, (float) (Math.random() * 2));
+						p.getWorld().playSound(p.getLocation(), Sound.valueOf(getConfig().getString("Sound.default")), 1F, (float) (Math.random() * 2));
 					}
 					if(index == getConfig().getInt("Cooldown") * 2 - 1 && returnInfo.containsKey(FINALFOODID))
 						p.getInventory().setItem(p.getInventory().firstEmpty(), returnInfo.get(FINALFOODID));
@@ -229,9 +224,9 @@ public class FoodLol extends JavaPlugin implements Listener{
 	public void onDamage(EntityDamageByEntityEvent e){
 		if(e.getDamager() instanceof Player){
 			Player p = (Player) e.getDamager();
-			if(p.getItemInHand() != null && !p.getItemInHand().getType().equals(Material.AIR)){
-				for(ItemStack i : foodInfo.values()){
-					if(i.isSimilar(p.getItemInHand())){
+			if(p.getInventory().getItemInMainHand() != null && !p.getInventory().getItemInMainHand().getType().equals(Material.AIR)){
+				for(ItemStack i : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.values()){
+					if(i.isSimilar(p.getInventory().getItemInMainHand())){
 						e.setDamage(1);
 						break;
 					}
@@ -240,6 +235,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		boolean handleCommand = false;
 		if(sender instanceof Player && sender.hasPermission("foodlol.use"))
@@ -256,8 +252,8 @@ public class FoodLol extends JavaPlugin implements Listener{
 				if(args[0].equalsIgnoreCase("list")){
 					String message = "";
 					int index = 0;
-					for(String s : foodInfo.keySet()){
-						if(index != foodInfo.size() - 1)
+					for(String s : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.keySet()){
+						if(index != getLoadEnhancedItemstackFromConfig().enhancedItemInfo.size() - 1)
 							message += "- " + s + "\n";
 						else
 							message += "- " + s;
@@ -271,7 +267,7 @@ public class FoodLol extends JavaPlugin implements Listener{
 				}else if(args[0].equalsIgnoreCase("reload")){
 					overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
 					
-					foodInfo = new HashMap<String, ItemStack>();
+					WipeItemstackFromConfigCache();
 					healthInfo = new HashMap<String, Double>();
 					hungerInfo = new HashMap<String, Double>();
 					returnInfo = new HashMap<String, ItemStack>();
@@ -287,20 +283,20 @@ public class FoodLol extends JavaPlugin implements Listener{
 					String playerName = args[1];
 					String foodID = args[2];
 					if(Bukkit.getOfflinePlayer(playerName).isOnline()){
-						if(foodInfo.containsKey(foodID)){
+						if(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.containsKey(foodID)){
 							Player oP = Bukkit.getPlayer(playerName);
-							ItemStack item = foodInfo.get(foodID);
+							ItemStack item = getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(foodID).clone();
 							//
 							ItemStack forceStack = null;
-							ItemStack keyItem = null;
-							for(ItemStack i : ItemCreator.forceStackInfo.keySet()){
-								if(item.isSimilar(i)){
+//							ItemStack keyItem = null;
+							for(ItemStack i : getLoadEnhancedItemstackFromConfig().forceStackInfo.keySet()){
+								if(getLoadEnhancedItemstackFromConfig().isSimilar(item, i)){
 									forceStack = item;
-									keyItem = i;
+//									keyItem = i;
 								}
 							}
 							if(forceStack != null){
-								ItemCreator.giveCustomItem(oP, item);
+								getLoadEnhancedItemstackFromConfig().giveCustomItem(oP, item);
 							}
 							//
 //							oP.getInventory().addItem(foodInfo.get(foodID));
@@ -328,13 +324,15 @@ public class FoodLol extends JavaPlugin implements Listener{
 					String playerName = args[1];
 					String foodID = args[2];
 					if(Bukkit.getOfflinePlayer(playerName).isOnline()){
-						if(foodInfo.containsKey(foodID)){
+						if(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.containsKey(foodID)){
 							Player oP = Bukkit.getPlayer(playerName);
-							ItemStack foodItem = foodInfo.get(foodID);
+							ItemStack foodItem = getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(foodID).clone();
 							try{
 								foodItem.setAmount(foodItem.getAmount() * Integer.valueOf(args[3]));
-								oP.getInventory().addItem(foodItem);
+								getLoadEnhancedItemstackFromConfig().giveCustomItem(oP, foodItem);
+//								oP.getInventory().addItem(foodItem);
 							}catch(Exception e){
+								e.printStackTrace();
 								if(sender instanceof Player){
 									Player p = (Player) sender;
 									p.sendMessage("That is not a number.");
@@ -409,8 +407,8 @@ public class FoodLol extends JavaPlugin implements Listener{
         return replaced;
     }
 	
-	public static String getUUIDFromFoodName(String foodName) {
-		PluginFile pf = new PluginFile(plugin, "uuidbase");
+	public String getUUIDFromFoodName(String foodName) {
+		PluginFile pf = new PluginFile(this, "uuidbase");
 		if(pf.getKeys(false) == null || pf.getKeys(false).size() == 0) {
 			pf.save();
 		}
