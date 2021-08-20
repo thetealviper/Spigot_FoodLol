@@ -31,17 +31,19 @@ public class StartupUpdateCheck {
 	
 	private void updatePlugin(JavaPlugin plugin, String spigotID){
 		String installed = plugin.getDescription().getVersion();
-		String[] installed_Arr = installed.split("[.]");
+//		String[] installed_Arr = installed.split("[.]");
 		String posted = getSpigotVersion(spigotID);
 		if(posted == null)
 			return;
-		String[] posted_Arr = posted.split("[.]");
-		for(int i = 0;i < posted_Arr.length;i++){
-			if(installed_Arr.length <= i || Integer.valueOf(installed_Arr[i]) < Integer.valueOf(posted_Arr[i])){
-				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.getDescription().getName() + " has an update ready [" + installed + " -> " + posted + "]!");
-				break;
-			}
-		}
+//		String[] posted_Arr = posted.split("[.]");
+//		for(int i = 0;i < posted_Arr.length;i++){
+//			if(installed_Arr.length <= i || Integer.valueOf(installed_Arr[i]) < Integer.valueOf(posted_Arr[i])){
+//				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.getDescription().getName() + " has an update ready [" + installed + " -> " + posted + "]!");
+//				break;
+//			}
+//		}
+		if(posted.compareToIgnoreCase(installed) > 0)
+			plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.getDescription().getName() + " has an update ready [" + installed + " -> " + posted + "]!");
 	}
 	private void updateConfig(JavaPlugin plugin){
 		YamlConfiguration compareTo = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource("config.yml")));
@@ -75,7 +77,7 @@ public class StartupUpdateCheck {
         try {
         	HttpClient client = HttpClient.newHttpClient();
         	HttpRequest request = HttpRequest.newBuilder()
-        		    .uri(URI.create("https://api.spiget.org/v2/resources/73487/versions/latest"))
+        			.uri(URI.create("https://api.spiget.org/v2/resources/" + spigotID + "/versions/latest"))
         		    .build();
         	HttpResponse<String> response = client.send(request,
         		    HttpResponse.BodyHandlers.ofString());

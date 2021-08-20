@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,6 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import me.TheTealViper.foodlol.Utils.PluginFile;
 import me.TheTealViper.foodlol.Utils.UtilityEquippedJavaPlugin;
+import net.md_5.bungee.api.ChatColor;
 
 public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 //	public Map<String, ItemStack> foodInfo = new HashMap<String, ItemStack>();
@@ -38,7 +40,7 @@ public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 	boolean overrideMaxHealth = false;
 	
 	public void onEnable(){
-		StartupPlugin(this, "50031");
+		StartupPlugin(this, "49852");
 		
 		custPlugin = this;
 		overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
@@ -115,7 +117,8 @@ public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 		ItemStack hand = p.getInventory().getItemInMainHand();
 		boolean found = false;
 		for(ItemStack dummy : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.values()){
-			if(hand.isSimilar(dummy)){
+//			if(hand.isSimilar(dummy)){
+			if(getLoadEnhancedItemstackFromConfig().isSimilar(hand, dummy)){
 				found = true;
 				break;
 			}
@@ -126,8 +129,10 @@ public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 		if(p.getFoodLevel() == 20)
 			return true;
 		String foodID = "";
+		//This second loop through is necessary to set the foodID
 		for(String dummy : getLoadEnhancedItemstackFromConfig().enhancedItemInfo.keySet()){
-			if(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(dummy).isSimilar(hand)){
+//			if(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(dummy).isSimilar(hand)){
+			if(getLoadEnhancedItemstackFromConfig().isSimilar(getLoadEnhancedItemstackFromConfig().enhancedItemInfo.get(dummy), hand)) {
 				foodID = dummy;
 				break;
 			}
@@ -183,7 +188,7 @@ public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 						}
 					}
 					if(pot != null){
-						p.addPotionEffect(new PotionEffect(pot, (int) (effectDuration / 20d), effectLevel));
+						p.addPotionEffect(new PotionEffect(pot, (int) (effectDuration * 20d), effectLevel));
 					}
 				}
 			}
@@ -265,6 +270,7 @@ public class FoodLol extends UtilityEquippedJavaPlugin implements Listener{
 						sender.sendMessage(message);
 					}
 				}else if(args[0].equalsIgnoreCase("reload")){
+					reloadConfig();
 					overrideMaxHealth = getConfig().getBoolean("Override_Max_Health");
 					
 					WipeItemstackFromConfigCache();

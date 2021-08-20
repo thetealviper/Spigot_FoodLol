@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64;
@@ -44,6 +45,9 @@ public class LoadEnhancedItemstackFromConfig implements Listener{
 	 * id: DIRT
 	 * amount: 1
 	 * name: "Dirt"
+	 * lore:
+	 *  - "1"
+	 *  - "2"
 	 * enchantments:
 	 * 	- "arrowdamage:1"
 	 *  - "arrowfire:1"
@@ -304,7 +308,7 @@ public class LoadEnhancedItemstackFromConfig implements Listener{
 		return true;
 	}
 	
-	public void giveCustomItem(Player p, ItemStack item){
+	public void giveCustomItem(Player p, ItemStack item){ 
 		int amount = item.getAmount();//Start at the item's amount because they're picking it up
 		for(int i = 0;i < 36;i++){
 			if(p.getInventory().getItem(i) != null && isSimilar(p.getInventory().getItem(i),item)){
@@ -314,7 +318,7 @@ public class LoadEnhancedItemstackFromConfig implements Listener{
 		}
 		int stackSize = getForceStackSize(item);
 		while(amount > 0){
-			if(amount > stackSize){
+			if(stackSize != -1 && amount > stackSize){
 				ItemStack temp = item.clone();
 				temp.setAmount(stackSize);
 				p.getInventory().setItem(p.getInventory().firstEmpty(), temp);

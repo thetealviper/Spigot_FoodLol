@@ -1,6 +1,6 @@
 name: "FoodLol"
 author: TheTealViper
-version: "1.16.4.a.1"
+version: "1.17.1.a.3"
 api-version: 1.16
 description: "Make custom food"
 main: me.TheTealViper.foodlol.FoodLol
